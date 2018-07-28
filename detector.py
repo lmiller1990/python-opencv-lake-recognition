@@ -58,41 +58,41 @@ def draw_grid(image, poly, color, step=50):
         x = 0
         y += step
         
-def draw_contours_and_grid_by_algorithm(algorithm):
-
-if __name__ == "__main__":
+def draw_contours_and_grid_by_algorithm(algorithm, filename, color, fig_name):
     # Color of a lake [blue green red]
     BGR = np.array([255, 218, 170])
     upper = BGR + 10
     lower = BGR - 10
 
     # get outline (contour) lines of Lake
-    image = read_image("pond.png")
+    image = read_image(filename)
     mask = find_mask(image, lower, upper)
     contours = find_contours(mask)
-
-    # Create approximations of Lake outline
     main_contour = get_main_contour(contours) 
-    hull = get_convex_hull(main_contour)
-    approx = get_approx_shape(main_contour)
 
-    # draw contour using all surrounding points
-    draw_contours(main_contour, image, color=green)
+    #hull = get_convex_hull(main_contour)
+    the_contours = algorithm(main_contour)
 
+    draw_contours([the_contours], image, color)
+
+    approx_poly = create_polygon_from_contours(the_contours)
+    draw_grid(image, approx_poly, color)
+
+    cv.imshow(fig_name, image)
+
+
+if __name__ == "__main__":
     # draw contour using approximate shape
     # https://docs.opencv.org/3.4.0/dd/d49/tutorial_py_contour_features.html
     # section 4
-    draw_contours([approx], image, color=blue)
+    draw_contours_and_grid_by_algorithm(
+            get_approx_shape, "pond.png", blue, "Approximate")
 
     # draw contour using convex hull
     # https://docs.opencv.org/3.4.0/dd/d49/tutorial_py_contour_features.html
     # section 5
-    draw_contours([hull], image, color=red)
+    draw_contours_and_grid_by_algorithm(
+            get_convex_hull, "pond.png", red, "Convex Hull")
 
-    # Create polygon from the contours and draw squares inside
-    approx_poly = create_polygon_from_contours(approx)
-    draw_grid(image, approx_poly, color=blue)
-
-    cv.imshow("Output", image)
     key = cv.waitKey(0)
 
