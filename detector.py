@@ -62,8 +62,8 @@ def draw_grid(image, poly, step=50):
                and PointInPolygon(poly, lower_left) \
                and PointInPolygon(poly, lower_right):
                 
-                print(x, x+step, y, y+step)
-                print("It is in the main area")
+                #print(x, x+step, y, y+step)
+                #print("It is in the main area")
                 # top line
                 cv.line(image, (x, y), (x + step, y), (255, 0, 0), 1, 1)
                 # bottom line
@@ -73,7 +73,8 @@ def draw_grid(image, poly, step=50):
                 # right line
                 cv.line(image, (x + step, y), (x + step, step + y), (255, 0, 0), 1, 1)
             else:
-                print("Not in the main area")
+                pass
+                #print("Not in the main area")
 
             x += step
 
@@ -112,9 +113,14 @@ if __name__ == "__main__":
 
     hull = cv.convexHull(main_contour)
 
-    #show_contours([main_contour], image)
+    #print(main_contour)
+    main_contour = get_main_contour(contours) 
+    epsilon = 0.01 * cv.arcLength(main_contour, True)
+    approx = cv.approxPolyDP(main_contour, epsilon, True)
+    print(approx)
+    show_contours([approx], image)
 
-    poly = get_main_polygon(hull)
+    poly = get_main_polygon(approx)
 
     draw_grid(image, poly)
 
