@@ -9,6 +9,7 @@
 
 import cv2 as cv
 import numpy as np
+from raycast_test import Polygon, PointInPolygon, Point
 
 # Color of a lake [blue green red]
 BGR = np.array([255, 218, 170])
@@ -43,6 +44,33 @@ def show_contours(contours, image):
 
     cv.imshow("contours", image)
 
+def draw_grid(image, step=50):
+    x = 0
+    y = 0
+    height = len(image)
+    width = len(image[0])
+
+    while y < height:
+        while x < width:
+            # horizontal lines
+            cv.line(image, (x, 0), (x + step, 0), (255, 0, 0), 1, 1)
+            cv.line(image, (x, step), (x + step, step), (255, 0, 0), 1, 1)
+
+            cv.line(image, (x, 0), (x, step), (255, 0, 0), 1, 1)
+            cv.line(image, (x + step, 0), (x + step, step), (255, 0, 0), 1, 1)
+            x += step
+        y += step
+    
+
+def calculate_midpoint(contours):
+    x = 0
+    y = 0
+    for c in contours:
+        x += c[0]
+        y += c[1]
+
+    return [x / len(contours), y / len(contours)]
+
 def get_main_contour(contours):
     copy = contours.copy()
     copy.sort(key=len, reverse=True)
@@ -54,7 +82,9 @@ if __name__ == "__main__":
 
     contours = find_contours(mask)
     main_contour = get_main_contour(contours) 
+    draw_grid(image)
     show_contours([main_contour], image)
+    print(len(image), len(image[0]))
 
     key = cv.waitKey(0)
 
