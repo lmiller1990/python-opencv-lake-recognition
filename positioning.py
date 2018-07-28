@@ -7,8 +7,8 @@
 # poly.AddPoint(Point(2,0))
 # poly.AddPoint(Point(2,2))
 # poly.AddPoint(Point(0,2))
-# print(PointInPolygon(poly, Point(3,1)))
-# print(PointInPolygon(poly, Point(1,1)))
+# print(point_in_polygon(poly, Point(3,1)))
+# print(point_in_polygon(poly, Point(1,1)))
 
 def create_polygon_from_contours(points):
     poly = Polygon()
@@ -18,7 +18,7 @@ def create_polygon_from_contours(points):
 
     return poly
 
-def PointInPolygon(polygon, point):
+def point_in_polygon(polygon, point):
     testline_left = Segment(Point(-999999999,point.y), point)
     testline_right = Segment(point, Point(-999999999,point.y))
     count_left = 0

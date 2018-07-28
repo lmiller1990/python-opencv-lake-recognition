@@ -10,9 +10,9 @@
 import cv2 as cv
 import numpy as np
 from colors import blue, red, green
-from processing import find_mask, find_contours, get_main_contour, get_approx_shape, get_convex_hull 
-from drawing import draw_contours
-from positioning import Polygon, PointInPolygon, Point, create_polygon_from_contours
+from processing import get_main_contour, get_approx_shape, get_convex_hull 
+from drawing import draw_grid, draw_contours
+from positioning import create_polygon_from_contours
 
 # Read an image from disk
 # @param {path} the path of the image to read
@@ -23,59 +23,23 @@ def read_image(path):
 # @param {image} image to draw on
 # @param {Polygon} a polygon build from many [x, y] points
 # @param {int=50} the size of the squares in pixels
-def draw_grid(image, poly, color, step=50):
-    x = 0
-    y = 0
-    height = len(image)
-    width = len(image[0])
-
-    while y < height:
-        while x < width:
-            upper_left = Point(x, y)
-            upper_right = Point(x + step, y)
-            lower_left = Point(x, step + y)
-            lower_right = Point(x + step, y + step)
-
-            # only draw if the all four points of the square
-            # would be inside the polygon (the Lake)
-            if PointInPolygon(poly, upper_left) \
-               and PointInPolygon(poly, upper_right) \
-               and PointInPolygon(poly, lower_left) \
-               and PointInPolygon(poly, lower_right):
-                
-                # top line
-                cv.line(image, (x, y), (x + step, y), color, 1, 1)
-                # bottom line
-                cv.line(image, (x, step + y), (x + step, step + y), color, 1, 1)
-                # left line
-                cv.line(image, (x, y), (x, step + y), color, 1, 1)
-                # right line
-                cv.line(image, (x + step, y), (x + step, step + y), color, 1, 1)
-            else:
-                pass
-
-            x += step
-        x = 0
-        y += step
         
 def draw_contours_and_grid_by_algorithm(algorithm, filename, color, fig_name):
+    image = read_image(filename)
+
     # Color of a lake [blue green red]
     BGR = np.array([255, 218, 170])
     upper = BGR + 10
     lower = BGR - 10
 
-    # get outline (contour) lines of Lake
-    image = read_image(filename)
-    mask = find_mask(image, lower, upper)
-    contours = find_contours(mask)
-    main_contour = get_main_contour(contours) 
+    # get a list of contour points around the Lake
+    main_contour = get_main_contour(image, lower, upper) 
 
-    #hull = get_convex_hull(main_contour)
-    the_contours = algorithm(main_contour)
+    contours = algorithm(main_contour)
 
-    draw_contours([the_contours], image, color)
+    draw_contours([contours], image, color)
 
-    approx_poly = create_polygon_from_contours(the_contours)
+    approx_poly = create_polygon_from_contours(contours)
     draw_grid(image, approx_poly, color)
 
     cv.imshow(fig_name, image)

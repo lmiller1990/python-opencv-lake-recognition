@@ -13,7 +13,8 @@ def find_contours(mask):
 
     return cnts
 
-def get_main_contour(contours):
+def get_main_contour(image, lower, upper):
+    contours = get_contours(image, lower, upper)
     copy = contours.copy()
     copy.sort(key=len, reverse=True)
     return copy[0]
