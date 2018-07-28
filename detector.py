@@ -44,7 +44,7 @@ def show_contours(contours, image):
 
     cv.imshow("contours", image)
 
-def draw_grid(image, step=50):
+def draw_grid(image, poly, step=50):
     x = 0
     y = 0
     height = len(image)
@@ -52,15 +52,34 @@ def draw_grid(image, step=50):
 
     while y < height:
         while x < width:
-            # horizontal lines
-            cv.line(image, (x, 0), (x + step, 0), (255, 0, 0), 1, 1)
-            cv.line(image, (x, step), (x + step, step), (255, 0, 0), 1, 1)
+            upper_left = Point(x, y)
+            upper_right = Point(x + step, y)
+            lower_left = Point(x, step + y)
+            lower_right = Point(x + step, y + step)
 
-            cv.line(image, (x, 0), (x, step), (255, 0, 0), 1, 1)
-            cv.line(image, (x + step, 0), (x + step, step), (255, 0, 0), 1, 1)
+            if PointInPolygon(poly, upper_left) \
+               and PointInPolygon(poly, upper_right) \
+               and PointInPolygon(poly, lower_left) \
+               and PointInPolygon(poly, lower_right):
+                
+                print(x, x+step, y, y+step)
+                print("It is in the main area")
+                # top line
+                cv.line(image, (x, y), (x + step, y), (255, 0, 0), 1, 1)
+                # bottom line
+                cv.line(image, (x, step + y), (x + step, step + y), (255, 0, 0), 1, 1)
+                # left line
+                cv.line(image, (x, y), (x, step + y), (255, 0, 0), 1, 1)
+                # right line
+                cv.line(image, (x + step, y), (x + step, step + y), (255, 0, 0), 1, 1)
+            else:
+                print("Not in the main area")
+
             x += step
+
+        x = 0
         y += step
-    
+        
 
 def calculate_midpoint(contours):
     x = 0
@@ -76,15 +95,30 @@ def get_main_contour(contours):
     copy.sort(key=len, reverse=True)
     return copy[0]
 
+def get_main_polygon(points):
+    poly = Polygon()
+    for point in points:
+        x, y = point[0]
+        poly.AddPoint(Point(x, y))
+
+    return poly
+
 if __name__ == "__main__":
     image = read_image("pond.png")
     mask = find_mask(image)
 
     contours = find_contours(mask)
     main_contour = get_main_contour(contours) 
-    draw_grid(image)
-    show_contours([main_contour], image)
-    print(len(image), len(image[0]))
+
+    hull = cv.convexHull(main_contour)
+
+    #show_contours([main_contour], image)
+
+    poly = get_main_polygon(hull)
+
+    draw_grid(image, poly)
+
+    show_contours([hull], image)
 
     key = cv.waitKey(0)
 
