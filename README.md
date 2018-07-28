@@ -1,16 +1,16 @@
-Detecting and Outline Lakes with python and OpenCV
+Detecting and Outline Lakes with Python3 and OpenCV 3
 
-In the article, I will go over some basic shape and contour detection using python3 and OpenCV.
+In the article, I will go over some basic shape and contour detection using Python3 and OpenCV.
 
 ## Goal
 
-The goal is given screen capture from Google Maps, to detect the largest body of water, and calculate the radius and approximate area. The article introduces some code that, given a screen capture, detects the largest body of water and draws a line around the edge: 
+The goal is to detect the largest body of water and calculate the radius and approximate area, given screen capture from Google Maps. The article introduces some code that, given a screen capture, detects the largest body of water and draws a line around the edge: 
 
 !! SS result
 
 ## Setup
 
-I will use python3 and OpenCV 3. There are many ways to install python3. I installed OpenCV using homebrew by running `brew install opencv`. 
+I will use Python3 and OpenCV3. There are many ways to install Python3, I used [conda](https://anaconda.org/anaconda/python). I installed OpenCV using homebrew by running `brew install opencv`. 
 
 To check if opencv was installed, create a `detector.py` script and add the following:
 
@@ -28,13 +28,13 @@ And run with `python3 detector.py`. My output is:
 1.15.0
 ```
 
-I got an error regarding numpy. The fix was to reinstall numpy using homebrew.
+Prior to the above output, I got an error regarding numpy. The fix was to reinstalling numpy using homebrew.
 
 ## Basic Thresholding using inRange
 
-The next step is to apply a threshold, and get rid of the data we are not interested in. Since we are using Google Maps, lake are always the same shade of blue, which makes things simple.
+The next step is to apply a threshold, and get rid of the data we are not interested in. Since we are using Google Maps, lakes are always the same shade of blue, which makes things simple.
 
-Lakes have an RGB color of [170, 218, 255]. OpenCV uses a different ordering, BGR. 
+Lakes have an RGB color of `[170, 218, 255]`. OpenCV uses a different ordering, BGR. 
 
 !! SS color
 
@@ -49,7 +49,7 @@ upper = BGR + 10
 lower = BGR - 10
 ```
 
-Now add two functions: `read_image`, to get the image we willbe operating on, and `find_mask`, which applies the thresholding with `inRange`.
+Now add two functions: `read_image`, to get the image we will be operating on, and `find_mask`, which applies the thresholding with `inRange`.
 
 ```py
 def read_image(path):
@@ -76,7 +76,7 @@ I saved my screen capture as "pond.png". Running the above code with `python3 de
 
 596 is the height of the image, or the number of rows. Each row in an array containing 697 values, where each value is a 1x3 matrix contains [B, G, R] values. So an image is just a collection of BGR pixels.
 
-`inRange` is similar, however instead of each pixel being mapped to a BGR value, is it simply assigned a value of 0 or 1 - whether it is between the threshold, or not.
+`inRange` is similar, however instead of each pixel being mapped to a BGR value, is it simply assigned a value of 0 or 1 - whether or not it is between the threshold.
 
 Try rendering the mask with this code:
 
@@ -104,7 +104,7 @@ The output confirms `inRange` returns an array of 0 or 1 for each pixel:
 OpenCV has a `findContours` function which can find edges in a binary image. We have a binary image - that's why we created the mask. Read about `findContours` in the documentation [here](https://docs.opencv.org/2.4/modules/imgproc/doc/structural_analysis_and_shape_descriptors.html?#findcontours). The arguments are:
 
 - `image`: the binary image to use. `findContours` modifies the image, so we should pass in a copy
-- `mode`: the contour retrieval mode. These are described in the documentation. We are focusing on the largest area, so the best fit for this problem is `CV_RETR_EXTERNAL`
+- `mode`: the contour retrieval mode. The modes are described in the documentation. We are focusing on the largest area, so the best fit for this problem is `CV_RETR_EXTERNAL`
 - `method`: the contour approximation method. Again, described in the documentation. I don't really understand which is the best fit for this problem, so I just used `CHAIN_APPROX_SIMPLE` since this is a simple problem and that method has simple in the name. `¯\_(ツ)_/¯`
 
 Now we know about `findContours`, we can write the following function:
@@ -118,9 +118,9 @@ def find_contours(mask):
     return cnts
 ```
 
-`findContours` returns three values. The first appears to be the image modified by `findContours`, which we don't really need. The second is the contours that were found. The last is the hierarchy, which contains information about the image topology. I don't fully understand what this is useful for yet. We only want the second return value.
+`findContours` returns three values. The first appears to be the image modified by `findContours`, which we don't really need. The second is the contours that were found. The last is the hierarchy, which contains information about the image topology. I don't fully understand what this can be used for yet. We only want the second value, `cnts`.
 
-Running the `find_contours` function and passing in the `mask` from earlier gives us `Found 93 black shapes`. This is counting all the small bodies of water in the image. Not ideal for now, we we will fix this later. 
+Running the `find_contours` function and passing in the `mask` from earlier prints `Found 93 black shapes`. This is counting all the small bodies of water, or other blue pixels, in the image. Not ideal for now. We will fix this soon. 
 
 ## Drawing Contours using `drawContours`
 
@@ -152,7 +152,7 @@ show_contours(contours, image)
 
 ## Extracting the Largest Body of Water
 
-We have 93 contours. We only want the largest one, which is the one with the most points. Add a `main_contour` function:
+We have 93 contours, as shown above in the image. We only want the largest one, which is the one with the most points. Add a `main_contour` function:
 
 ```py
 def get_main_contour(contours):
@@ -188,4 +188,4 @@ This article described:
 - finding contours using `findContours` and the arguments it takes
 - showing the contours with `drawContours`
 
-This was my first time doing image recognition in a long time. My previous experience was using OpenCV with C++, and I am impressed at how much easier and more approachable it has become with the python3 bindings. I learned a lot reading [Py Image Search](https://www.pyimagesearch.com/2014/10/20/finding-shapes-images-using-python-opencv/), and it is a great resources web developers looking to try out python and image recognition.
+This was my first time doing image recognition in a long time. My previous experience was using OpenCV with C++, and I am impressed at how much easier and more approachable it has become with the Python bindings. I learned a lot reading [Py Image Search](https://www.pyimagesearch.com/2014/10/20/finding-shapes-images-using-python-opencv/), and it is a great resources web developers looking to try out Python and image recognition.
