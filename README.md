@@ -6,7 +6,7 @@ In the article, I will go over some basic shape and contour detection using Pyth
 
 The goal is to detect the largest body of water and calculate the radius and approximate area, given screen capture from Google Maps. The article introduces some code that, given a screen capture, detects the largest body of water and draws a line around the edge: 
 
-!! SS result
+![final_result](https://github.com/lmiller1990/python-opencv-lake-recognition/blob/master/result.png?raw=true)
 
 ## Setup
 
@@ -36,7 +36,7 @@ The next step is to apply a threshold, and get rid of the data we are not intere
 
 Lakes have an RGB color of `[170, 218, 255]`. OpenCV uses a different ordering, BGR. 
 
-!! SS color
+![color](https://github.com/lmiller1990/python-opencv-lake-recognition/blob/master/color.png?raw=true)
 
 We will use `cv.inRange` function, which takes three arguments: an image, a lower color range, and an upper color range. The documentation is [here](https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html#inrange). Based on trial and error, I found +-10 for the ranges work well.
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     key = cv.waitKey(0)
 ```
 
-!! SS mask
+![mask](https://github.com/lmiller1990/python-opencv-lake-recognition/blob/master/mask.png?raw=true)
 
 The output confirms `inRange` returns an array of 0 or 1 for each pixel:
 
@@ -148,7 +148,7 @@ contours = find_contours(mask)
 show_contours(contours, image)
 ```
 
-!! SS all_contours
+![all_contours](https://github.com/lmiller1990/python-opencv-lake-recognition/blob/master/all_contours.png?raw=true)
 
 ## Extracting the Largest Body of Water
 
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     key = cv.waitKey(0)
 ```
 
-!! SS: Final
+![final](https://github.com/lmiller1990/python-opencv-lake-recognition/blob/master/final.png?raw=true)
 
 Great.
 
